@@ -26,6 +26,8 @@ let buttonList = [];
 let friendsButton, statsButton, leaderboardButton, addFriendButton;
 //
 let friendTab, addFriendTabO, statTab;
+let LBtab;
+//
 //
 let cam1;
 //
@@ -68,7 +70,7 @@ let startMouseX = 0;
 let lastRot = 0;
 let rotVel = 0;
 //
-let userLiftDat;
+let userLiftData;//wtf
 //
 let faceList = [];
 //
@@ -89,6 +91,15 @@ function preload()
   face04 = loadImage('face04.png');
   face05 = loadImage('face05.png');
   face06 = loadImage('face06.png');
+  face07 = loadImage('face07.png');
+  face08 = loadImage('face08.png');
+  face09 = loadImage('face09.png');
+  face10 = loadImage('face10.png');
+  face11 = loadImage('face11.png');
+  face12 = loadImage('face12.png');
+  face13 = loadImage('face13.png');
+  face14 = loadImage('face14.png');
+  
   defaultFont = loadFont('BebasKai.otf');
 }
 function drawCharacter(shirtColor, skinColor, charSize, yRot, faceTexture, armRotL, armRotR, liftDats)
@@ -112,23 +123,17 @@ function drawCharacter(shirtColor, skinColor, charSize, yRot, faceTexture, armRo
       charSizeMod = (liftDats.dat[0] + liftDats.dat[1] + liftDats.dat[2]) / 110 * 5;
       armMod = liftDats.dat[3] / 25;
     }
-  else
-    {
-      // print("HEL");
-    }
   shoulderSize += shoulderMod;
   armThickness += armMod;
   
   let newCharSize = charSize + charSizeMod;
-
-  // print(shoulderSize);
+  bodyThickness = bodyThickness + charSizeMod / 4;
   push();
   // translate(width /2, height /2);
   rotateY(yRot);
   //
   // shoulders
   fill(shirtColor);
-  // print(shirtColor);
   push();
   translate(-bodyThickness - armThickness / 2, -newCharSize/2 +armPosition - shoulderSize / 5);
   sphere(shoulderSize,6,6);
@@ -163,16 +168,16 @@ function drawCharacter(shirtColor, skinColor, charSize, yRot, faceTexture, armRo
   //head
   fill(skinColor);
   push();
-  translate(0,neckY - bodyThickness);
+  translate(0,neckY - bodyThickness - charSizeMod/2);
   tint(skinColor);
   texture(faceTexture);
   sphere(bodyThickness,8,8);
   pop();
   //neck  
   push();
-  translate(0, neckY);
+  translate(0, neckY - charSizeMod/2);
   rotate(PI);
-  cone(bodyThickness,newCharSize/7);
+  cone(bodyThickness,newCharSize/4);
   //body
   // fill(shirtColor);
   pop();
@@ -183,13 +188,13 @@ function drawCharacter(shirtColor, skinColor, charSize, yRot, faceTexture, armRo
   //
   fill(skinColor);
   push();
-  translate(bodyThickness / 1.5, newCharSize / 2+ feetSize/2);
-  sphere(feetSize, 8,8);
+  translate(bodyThickness / 2, newCharSize / 2+ feetSize/2);
+  sphere(feetSize + charSizeMod/4, 8,8);
   pop();
   //
   push();
-  translate(-bodyThickness / 1.5, newCharSize / 2 + feetSize/2);
-  sphere(feetSize, 8,8);
+  translate(-bodyThickness / 2, newCharSize / 2 + feetSize/2);
+  sphere(feetSize + charSizeMod/4, 8,8);
   pop();
 }
 function setup() 
@@ -199,9 +204,6 @@ function setup()
   imageMode(CENTER);
   rectMode(CENTER);
   
-  // let tD = new UserData();
-  // tD.parseColor("[125,255,0]");
-  // print("HELLO".toLowerCase());
   
   characterSize = (200/1000) * width;
   //
@@ -213,6 +215,14 @@ function setup()
   append(faceList, face04);
   append(faceList, face05);
   append(faceList, face06);
+  append(faceList, face07);
+  append(faceList, face08);
+  append(faceList, face09);
+  append(faceList, face10);
+  append(faceList, face11);
+  append(faceList, face12);
+  append(faceList, face13);
+  append(faceList, face14);
   //
   textFont(defaultFont);
   //tab width is 60% of screenwidth
@@ -226,6 +236,7 @@ function setup()
   //
   //TAB SETUP
   friendTab = new friendsTab(width - (tabWidth/2), height / 2 + (headerHeight - tabHeight)/2,tabWidth, (height - headerHeight - tabHeight));
+  LBtab = new leaderboardTab(width - (tabWidth/2), height / 2 + (headerHeight - tabHeight)/2,tabWidth, (height - headerHeight - tabHeight));
   statTab = new statsTab(width - (tabWidth/2), height / 2 + (headerHeight - tabHeight)/2,tabWidth, (height - headerHeight - tabHeight));
   addFriendTabO = new addFriendTab(width - (tabWidth/2), height / 2 + (headerHeight - tabHeight)/2,tabWidth, (height - headerHeight - tabHeight));
   //
@@ -335,7 +346,7 @@ function mouseClicked()
         if(addFriendTabO.addFriendButton.isOver())
               {
                 addNewFriend(addFriendTabO.addFriendTB.getText());
-                addFriendTabO.addFriendTB.clearText();
+                
               }
         // for(let i = 0; i < 
       }
@@ -520,6 +531,10 @@ function draw()
       {
         statTab.drawTab();
       }
+      else if(currentTab == 3)
+        {
+          LBtab.drawTab();
+        }
     //draw header
     draw_header();
     drawMain();
@@ -567,7 +582,6 @@ function draw()
         lastRot = characterRot + newRot;
         let armRot = (rotVel) * PI;
         //
-      // print(currentUser.faceType);
       drawCharacter(currentUser.shirtColor,currentUser.skinColor, characterSize, characterRot + newRot, faceList[currentUser.faceType], armRot + 0.5*sin(millis()/300),armRot -0.5*sin(millis()/300), userLiftData);
         pop();
       }
@@ -719,6 +733,10 @@ function mouseWheel(event)
     {
       statTab.updateVelocity(event.delta * 10);
     }
+  else if(currentTab == 3)
+    {
+      LBtab.updateVelocity(event.delta * 10);
+    }
 }
 function addNewFriend(friendName)
 {
@@ -741,14 +759,30 @@ function addRandomFriend()
 }
 function prepareGraph(x, y, x_width, y_height)
 {
-  usernames = ["AlanDad", "MikeG"];
-  lifter1_data = [[1,100], [30,150], [40,175], [60, 180], [150, 200] , [250, 220], [300,250], [360,270]];
-  lifter2_data = [[0,50],[100,75], [200,125], [300,200]];
+  usernames = [];
+  colors = [];
+  append(colors, currentUser.shirtColor);
+  append(colors, compareTo.shirtColor);
+  append(usernames, currentUser.userName);
+  append(usernames, compareTo.name);
+  let lifter1_data = [];// = [[1,100], [30,150], [40,175], [60, 180], [150, 200] , [250, 220], [300,250], [360,270]];
+  let lifter2_data = [];//[[0,50],[100,75], [200,125], [300,200]];
   lifter_data = [lifter1_data, lifter2_data];
+  for(let i = 0; i < userLiftData.dat.length; i++)
+    {
+      let l1t = [];
+      let l2t = [];
+      append(l1t, i);
+      append(l1t, userLiftData.dat[i]);
+      append(l2t, i);
+      append(l2t, compareTo.liftData.dat[i]);
+      append(lifter1_data, l1t);
+      append(lifter2_data, l2t);
+    }
   rectMode(CORNER);
   x_width *= 1;
   y_height *= 0.8;
-    draw_chart(usernames, lifter_data, x - x_width / 2, y - y_height / 2, x_width, y_height);
+    draw_chart(usernames, lifter_data, x - x_width / 2, y - y_height / 2, x_width, y_height, colors);
 }
 function parseCColor(Val)
   {
@@ -756,9 +790,6 @@ function parseCColor(Val)
     let val = str(Val);
     let newVal = val.substring(2,val.length-2);
     let goodVals = split(newVal, ',');
-    print("color");
-    print(goodVals);
-    print(int(goodVals[1]));
     if(int(goodVals[3]) == null)
       {
         return color(int(goodVals[0]), int(goodVals[1]), int(goodVals[2]), 255);
@@ -858,7 +889,7 @@ class friendsTab
       {
         let yPos = this.y - (this.fHeight / 2) + ((this.entryHeight) * (1+i)) - this.entryOffset / 2 + this.scrollHeight;
         let xPos = this.x// - this.fWidth / 2;
-        let imgSize = this.fHeight * 0.09;
+        let imgSize = this.entryHeight * 0.75;//this.fHeight * 0.09;
         fill(this.tabColor);
         // stroke(0,0,0,40);
         noStroke();
@@ -876,6 +907,7 @@ class friendsTab
         noStroke();
         fill(0);
         textAlign(LEFT);
+        textSize(38);
         text(this.entries[i].getName(), xPos - this.fWidth/2 + imgSize * 1.5, yPos);
       }
     this.scrollHeight += this.scrollVelocity;
@@ -904,6 +936,7 @@ class friendsTab
   }
   populate(friendData)
   {
+    LBtab.populate(friendData);
     let buttonWidth = this.fWidth / 4;
     this.entries = friendData; // maybe change later
     this.friendCount = friendData.length;
@@ -916,6 +949,212 @@ class friendsTab
         let newButton = new Button("Compare", (this.x + this.fWidth / 2) - buttonWidth * 1.2, 0, buttonWidth, this.entryHeight * 0.6, 20);
         append(this.friendButtons, newButton);
       }
+  }
+}
+class leaderboardTab
+{
+  constructor(x, y, fWidth, fHeight)
+  {
+    this.x = x;
+    this.y = y;
+    this.fWidth = fWidth;
+    this.fHeight = fHeight;
+    this.entries = [];
+    this.maxShownEntries = 5;
+    this.entryOffset = 13;
+    this.entryHeight = fHeight * 1/this.maxShownEntries + this.entryOffset;
+    this.friendCount = 0;
+    this.tabColor = color(255,255,255,100);
+    this.scrollVelocity = 0;
+    this.scrollY = 0;
+    this.maxScroll = fWidth;
+    this.scrollHeight = 0;
+    this.totalLifts = [];
+    this.sortedIndex = [];
+  }
+  drawTab()
+  {
+    //first place person
+    //second place person
+    //third place person
+    let podiumPadding = this.fWidth * 0.01;
+    let podiumWidth = (this.fWidth - podiumPadding * 2) / 3;
+    let podiumHeight = this.fHeight * 0.1;
+    let midPodiumZ = -podiumWidth/2;
+    push();
+    //radius, height, dX, detailY
+    translate(this.x, this.y + podiumHeight * 3.5);
+    scale(0.9);
+    rotateY(sin(millis() / 4000) / 10);
+    rotateX(sin(millis() /3000) /8.4 - PI/8);
+    
+    let tp_friend;
+    let sp_friend;
+    let fp_friend;
+    
+    let c_size = podiumWidth / 2;
+    //left third place
+    //// /constructor(name, liftData, faceImage, shirtColor, skinColor)
+    if(this.sortedIndex.length >= 3)
+      {
+        tp_friend = this.entries[this.sortedIndex[2]];
+        push();
+        translate(-podiumWidth,-podiumHeight / 2 - c_size);
+        noStroke();
+        drawCharacter(tp_friend.shirtColor,tp_friend.skinColor, c_size, -(sin(millis() / 2000) / 3 + PI), faceList[tp_friend.faceImage], 0.2*sin(millis()/2000),-0.2*sin(millis()/2000), tp_friend.liftData);
+        pop();
+      }
+    push();
+    noStroke();
+    translate(-podiumWidth,-podiumHeight / 2);
+    if(this.sortedIndex.length>=3){fill(0);textSize(60);text(this.entries[this.sortedIndex[2]].name, 0, -podiumHeight * 3.5);}
+    fill(70);
+    cylinder(podiumWidth/2, podiumHeight, 8,8);
+    pop();
+    
+    //first place
+      if(this.sortedIndex.length >= 1)
+      {
+        tp_friend = this.entries[this.sortedIndex[0]];
+        
+        push();
+        translate(0,-podiumHeight * 3 - c_size);
+        noStroke();
+        //TROPHY
+        translate(0,0,midPodiumZ);
+        push();
+        translate(0,-c_size*2.65);
+        fill(252, 182, 3);
+        cone(c_size/3, c_size/2,7,7);
+        translate(0,c_size/3)
+        // sphere(c_size/5.5,5,5);
+        rotateX(PI);
+        fill(200, 150, 3);
+        cone(c_size/5,c_size/5,7,7)
+        pop();
+        //
+        drawCharacter(tp_friend.shirtColor,tp_friend.skinColor, c_size, (sin(millis() / 2000) / 3 + PI), faceList[tp_friend.faceImage], 0.25*sin(millis()/400) + PI,-0.25*sin(millis()/400) + PI, tp_friend.liftData);
+        pop();
+      }
+    push();
+    noStroke();
+    translate(0,-podiumHeight / 2 * 3, midPodiumZ);
+    
+    if(this.sortedIndex.length>=1){fill(0);textSize(40);text(this.entries[this.sortedIndex[0]].name, 0, -podiumHeight * 5.5);}
+      fill(97, 84, 49);
+    cylinder(podiumWidth/2, podiumHeight*3, 8,8);
+    pop();
+    
+    //second place
+      if(this.sortedIndex.length >= 2)
+      {
+        tp_friend = this.entries[this.sortedIndex[1]];
+        push();
+        translate(podiumWidth,-podiumHeight * 2 - c_size);
+        noStroke();
+        drawCharacter(tp_friend.shirtColor,tp_friend.skinColor, c_size, -(sin(millis() / 2000) / 3 + PI), faceList[tp_friend.faceImage], 0.2*sin(millis()/2000),-0.2*sin(millis()/2000), tp_friend.liftData);
+        pop();
+      }
+    push();
+    noStroke();
+    translate(podiumWidth, -podiumHeight / 2 * 2);
+    if(this.sortedIndex.length>=1){fill(0);textSize(40);text(this.entries[this.sortedIndex[1]].name, 0, -podiumHeight * 4.5);}
+    fill(200);
+    cylinder(podiumWidth/2, podiumHeight*2, 8,8);
+    pop();
+    
+    pop();
+    // for(let i = 0; i < this.friendCount; i++)
+    //   {
+    //     let yPos = this.y - (this.fHeight / 2) + ((this.entryHeight) * (1+i)) - this.entryOffset / 2 + this.scrollHeight;
+    //     let xPos = this.x// - this.fWidth / 2;
+    //     let imgSize = this.fHeight * 0.09;
+    //     fill(this.tabColor);
+    //     // stroke(0,0,0,40);
+    //     noStroke();
+    //     rect(xPos, yPos, this.fWidth, this.entryHeight * 0.95,3);
+    //     //
+    //     fill(this.entries[i].shirtColor);
+    //     rect(xPos - this.fWidth/2 + imgSize * 0.6,yPos, imgSize*1.1, imgSize*1.1);
+    //     tint(this.entries[i].skinColor);
+    //     // stroke(this.entries[i].shirtColor);
+    //     image(faceList[this.entries[this.sortedIndex[i]].getFace()], xPos - this.fWidth/2 + imgSize * 0.6,yPos, imgSize, imgSize);
+    //     //
+    //     // this.friendButtons[i].updateY(yPos+(this.entryHeight * 0.3))
+    //     // this.friendButtons[i].render();
+    //     //
+    //     noStroke();
+    //     fill(0);
+    //     textAlign(LEFT);
+    //     textSize(35);
+    //     text(this.entries[this.sortedIndex[i]].getName(), xPos - this.fWidth/2 + imgSize * 1.5, yPos);
+    //     text("Total:", xPos - this.fWidth/2 + imgSize * 3, yPos);
+    //     text(this.totalLifts[this.sortedIndex[i]], xPos - this.fWidth/2 + imgSize * 4.25, yPos);
+    //   }
+    // this.scrollHeight += this.scrollVelocity;
+    // this.scrollVelocity *= 0.4;
+    // let minScroll = 0;
+    // if(this.friendCount * this.entryHeight > this.fHeight)
+    //   {
+    //         minScroll = this.fHeight - (this.friendCount * this.entryHeight);
+    //   }
+    // else
+    //   {
+    //     minScroll = 0;
+    //   }
+    // if(this.scrollHeight < minScroll)
+    // {
+    //   this.scrollHeight -= (this.scrollHeight - minScroll) * .85;
+    // }
+    // else if (this.scrollHeight > 0)
+    //   {
+    //     this.scrollHeight *= 0.45;
+    //   }
+  }
+  populate(friendData2)
+  {
+    let friendData = [];
+    arrayCopy(friendData2,friendData);
+    // /constructor(name, liftData, faceImage, shirtColor, skinColor)
+    //userName, shirtColor, skinColor, faceType, workoutData, friendList)
+    append(friendData, (new Friend(currentUser.userName, userLiftData, currentUser.faceType, currentUser.shirtColor, currentUser.skinColor)));
+    let buttonWidth = this.fWidth / 4;
+    this.entries = friendData; // maybe change later
+    this.friendCount = friendData.length;
+    if(this.friendCount <= this.maxShownEntries)
+      {
+        this.maxScroll = this.fHeight;
+      }
+    let sortedList = [];
+    this.totalLifts = [];
+    for(let i = 0; i < this.friendCount; i++)
+      {
+        let totalLift = 0;
+        for(let f = 0; f < 5; f++)
+        {
+          totalLift += this.entries[i].liftData.dat[f];
+        }
+        totalLift += 1*i;
+        append(sortedList, totalLift);
+        append(this.totalLifts, totalLift);
+      }
+    sortedList = sort(sortedList);
+    sortedList.reverse();
+    for(let i = 0; i < this.friendCount; i++)
+      {
+        for(let f = 0; f < this.friendCount; f++)
+        {
+          if(sortedList[i] == this.totalLifts[f])
+            {
+              this.sortedIndex[i] = f;
+            }
+        }
+      }
+    // for(let i = 0; i < this.friendCount; i++)
+    //   {
+    //     let newButton = new Button("Compare", (this.x + this.fWidth / 2) - buttonWidth * 1.2, 0, buttonWidth, this.entryHeight * 0.6, 20);
+    //     append(this.friendButtons, newButton);
+    //   }
   }
 }
 class userData
@@ -1036,7 +1275,6 @@ class liftStats
   }
   updateStats(index, val)
   {
-    print("updated [ + " + index + "] to: " + val);
     this.dat[index] = val;
   }
   get(index)
@@ -1046,10 +1284,10 @@ class liftStats
 }
 
 
-function draw_chart(usernames, lifter_data,x, y, x_width, y_height) { 
+function draw_chart(usernames, lifter_data,x, y, x_width, y_height, colors) { 
   //console.log("START" );=
   //console.log("L00: " + lifter_data);
-
+  max_weight = 0;
   for (li= 0; li  < lifter_data.length; li++){
     for(lj= 0; lj < lifter_data[li].length; lj++){
           //console.log(" Wt: " + lifter_data[li][lj][1]);
@@ -1058,20 +1296,22 @@ function draw_chart(usernames, lifter_data,x, y, x_width, y_height) {
         }
     }
   }
-  graph_page(x,y,x_width, y_height, lifter_data,"Month","Weight", usernames);
+  graph_page(x,y,x_width, y_height, lifter_data,"Lift","Weight", usernames, colors);
   
 }
 
-function graph_page(x_cord, y_cord, x_width, y_height, lifter_data , x_label, y_label, usernames){
-  fill("white");
-  stroke("black");
+function graph_page(x_cord, y_cord, x_width, y_height, lifter_data , x_label, y_label, usernames, colors){
+  // fill("white");
+  // stroke("black");
+  noStroke();
+  fill(255,255,255,50);
   rect(x_cord, y_cord, x_width, y_height);
-  colors = ["black", "red", "blue" , "purple", "pink" , "orange"];
+  // colors = ["black", "red", "blue" , "purple", "pink" , "orange"];
   fill("");
   stroke("black");
-  let size = 100;
+//   let size = 100;
 
-  rect(x_cord + x_width -size *2, y_cord + y_height -size, size*2, size);
+//   rect(x_cord + x_width -size *2, y_cord + y_height -size, size*2, size);
   
 
   //draw_graph(x_cord, y_cord, x_width, y_height, lifter_data[0])
@@ -1079,7 +1319,7 @@ function graph_page(x_cord, y_cord, x_width, y_height, lifter_data , x_label, y_
   for(n=0; n< lifter_data.length; n++){
       //console.log("L1: " + lifter_data);
       draw_graph(x_cord, y_cord, x_width, y_height, lifter_data[n] , colors[n]);
-      create_legend(x_cord, y_cord, x_width, y_height ,usernames[n], colors[n] , n+1, size);
+      // create_legend(x_cord, y_cord, x_width, y_height ,usernames[n], colors[n] , n+1, size);
   }
   fill("black");
   generate_x_axis(x_cord, y_cord, x_width, y_height, x_label);
@@ -1094,7 +1334,8 @@ function create_legend(x_cord, y_cord, x_width, y_height, username, color, user_
   //console.log("Create_legend called");
   stroke("black");
   textSize(20);
-  text(username + "= ", x_cord + x_width - size *2 +username.length*6, y_cord + y_height -size + 20*user_number);
+  textAlign(CENTER,CENTER);
+  text(username + "= ", x_cord - x_width, y_cord - y_height + size * 2 + 20*user_number);
   fill(color);
   noStroke();
   rect(x_cord + x_width - size *2 + username.length* 6+ 40  , y_cord + y_height -size + 20*user_number -5  , 15 ,15 );
@@ -1103,14 +1344,16 @@ function create_legend(x_cord, y_cord, x_width, y_height, username, color, user_
 
 
 function generate_x_axis(x_cord, y_cord, x_width, y_height, x_label){
-  months = ["", "Feb","Mar", "Apr", "May","Jun", "Jul", "Aug", "Sep", "Oct", "Nov","Dec"];
+  // months = ["", "Feb","Mar", "Apr", "May","Jun", "Jul", "Aug", "Sep", "Oct", "Nov","Dec"];
+  labels = ["Squat", "Bench", "Deadlift", "Curl", "OHP"];
   textSize(15);
   textStyle(NORMAL);
-  for(i = 0; i < months.length; i++){
+  for(i = 0; i < labels.length; i++)
+  {
     stroke("black");
-    line(x_cord + i*(x_width/12), y_cord+y_height, x_cord + i*(x_width/12), y_cord+ y_height -10);
+    line(x_cord + i*(x_width/5), y_cord+y_height, x_cord + i*(x_width/5), y_cord+ y_height -10);
     noStroke();
-    text(months[i], x_cord+ i*(x_width/12) , y_cord+y_height- 25);  
+    text(labels[i], x_cord+ i*(x_width/5) , y_cord+y_height- 25);  
   }
   noStroke();
   text(x_label, x_cord + x_width * 0.5 -5 , y_cord + y_height + 40);
@@ -1141,7 +1384,7 @@ function draw_graph(x_cord, y_cord, x_width, y_height,lifter_data, color){
     //Translate the points to the desired scale
     //console.log("110: " + lifter_data);
     for (i=0;i<lifter_data.length;i++){
-        x_data.push(lifter_data[i][0] * (x_width/365));
+        x_data.push(lifter_data[i][0] * (x_width/5));
         y_data.push(lifter_data[i][1] * (y_height/max_weight));
         //console.log(y_data);
 
@@ -1159,10 +1402,12 @@ function drawEllipses(x_data,y_data, x_width, y_height , x_cord, y_cord){
  
   noStroke();
     // draw ellipses
-  var circle_size = 4;
+  var circle_size = (width/1000) * 20
   for(let i =0; i < x_data.length; i++){
-      fill('black');
+      fill(0,0,0,30);
       ellipse(x_cord  + x_data[i] ,  y_cord + y_height  - y_data[i] , circle_size);
+    fill(0,0,0,100);
+    ellipse(x_cord  + x_data[i] ,  y_cord + y_height  - y_data[i] , circle_size/4);
       //console.log("Ellipse drawn");
 
   }
@@ -1172,6 +1417,7 @@ function drawLines(x_data,y_data, x_width, y_height , x_cord, y_cord, color ){
   stroke(color);
   //fill("red");
   //draw lines
+  strokeWeight(10);
   let px = x_data[0];
   let py = y_data[0];
 
@@ -1187,24 +1433,6 @@ function drawLines(x_data,y_data, x_width, y_height , x_cord, y_cord, color ){
 //
 function fillData(uDat)
 {
-  // let newStats = new liftStats([225, 225, 150, 95, 145]);
-  // userLiftData = newStats;
-  // statTab.populate(userLiftData);
-  
-  //this.names = ["Squat", "Bench", "Deadlift", "Curl", "OHP"];
-  //onstructor(userName, shirtColor, skinColor, faceType, workoutData, friendList)
-  // let newSquat =  int(uDat.squat.substring(2,5));
-  // let newBench =  int(uDat.bench.substring(2,5));
-  // let newDeadlift =  int(uDat.deadlift.substring(2,5));
-  // let newCurl =  int(uDat.curl.substring(  2,5));
-  // let newOHP =  int(uDat.ohp.substring(2,5));
-  //
-  // let newStats = new liftStats([newSquat, newBench, newDeadlift, newCurl, newOHP]);
-  //
-  print("SQUAT: " + uDat.squat);
-  // let newStats = new liftStats([uDat.squat, uDat.bench, uDat.deadlift, uDat.curl, uDat.ohp])
-  // let newStats = new
-  // print(newStats);
   let userDat = new liftStats([int(uDat.squat), int(uDat.bench), int(uDat.deadlift), int(uDat.curl), int(uDat.ohp)]);
   userLiftData = userDat;
   statTab.populate(userLiftData);
@@ -1233,9 +1461,6 @@ class UserData
     let val = str(Val);
     let newVal = Val.substring(2,val.length-2);
     let goodVals = split(newVal, ',');
-    print(goodVals);
-    print("hi colors");
-    print(int(goodVals[1]) + ", "+int(goodVals[2]) + ", " + int(goodVals[3]));
     return color(int(goodVals[1]), int(goodVals[2]), int(goodVals[3]), 255);
   }
   setShirtColor(val)
@@ -1260,14 +1485,11 @@ function hasFriend(friendName)
 }
 function getNewFriend(userDat, friendName)
 {
-  print("UD:" + userDat);
   let foundFriend = false;
   for(let r = 0; r < userDat.length; r++)
     {
         let curr_row = userDat[r];
         let user1 = new UserData();
-        print(userDat);
-        print("DD: " + curr_row);
         user1.username = JSON.parse(curr_row.Username);
         user1.friends = JSON.parse(curr_row.Friends);
         user1.shirtColor = str(curr_row.Shirt_Color);
@@ -1281,20 +1503,17 @@ function getNewFriend(userDat, friendName)
         
         user1.email= JSON.parse(curr_row.Email);
         user1.password= JSON.parse(curr_row.Password);
-      print(user1.username);
         if(friendName.toLowerCase() == user1.username.toLowerCase() && !hasFriend(friendName.toLowerCase()))
           {
             foundFriend = true;
-            print("DONE");
-            addFriendTabO.addFriendTB.setTextTemp("added successfully...",100);
+            addFriendTabO.addFriendTB.setTextTemp("added successfully...",25);
             createUserFriend(user1);
             break;
           }
     }
   if(foundFriend == false)
     {
-      print("bad");
-      addFriendTabO.addFriendTB.setTextTemp("no user found...",100);
+      addFriendTabO.addFriendTB.setTextTemp("no user found...",25);
     }
 }
 function populateFriends(userDat, friendList)
@@ -1303,7 +1522,6 @@ function populateFriends(userDat, friendList)
     {
       let curr_row = userDat[r];
         let user1 = new UserData();
-        print(userDat);
         user1.username = JSON.parse(curr_row.Username);
         user1.friends = JSON.parse(curr_row.Friends);
         user1.shirtColor = str(curr_row.Shirt_Color);
@@ -1314,8 +1532,6 @@ function populateFriends(userDat, friendList)
         user1.squat =JSON.parse(curr_row.Squat);
         user1.deadlift = JSON.parse(curr_row.Deadlift);
         user1.ohp= JSON.parse(curr_row.OHP);
-        print(user1.deadlift);
-        print(user1.faceType);
         user1.email= JSON.parse(curr_row.Email);
         user1.password= JSON.parse(curr_row.Password);
         if(friendList.includes(user1.username))
@@ -1336,13 +1552,11 @@ function loginAttempt(userDat)
     {
         let curr_row = userDat[r];
         let user1 = new UserData();
-        print("LOL" + userDat[r]);
-        print(userDat[r]);
         user1.username = JSON.parse(curr_row.Username);
         user1.friends = JSON.parse(curr_row.Friends);
         user1.shirtColor = str(curr_row.Shirt_Color);
         user1.skinColor = str(curr_row.Skin_Color);
-        user1.faceType = int(curr_row.Face_Number);
+        user1.faceType = int(JSON.parse(curr_row.Face_Number))
         user1.curl = JSON.parse(curr_row.Curl);
         user1.bench = JSON.parse(curr_row.Bench);
         user1.squat =JSON.parse(curr_row.Squat);
@@ -1352,8 +1566,6 @@ function loginAttempt(userDat)
         user1.password= JSON.parse(curr_row.Password);
         if(user1.username.toLowerCase() == attemptUsername.toLowerCase() && user1.password.toLowerCase() == attemptPassword.toLowerCase())
           {
-            // print(user1.skinColor);
-            // print(user1.shirtColor);
             loginSuccess = true;
             // fillData(user1);
             
