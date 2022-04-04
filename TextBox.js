@@ -34,17 +34,18 @@ class TextBox
     textSize(this.tH * 0.6);
     rect(this.x,this.y,this.tW, this.tH);
     fill(0);
-    text(this.Text, this.x, this.y);
     if(this.cntr > 1)
       {
+        fill(255,0,0);
         this.cntr--;
-        print(this.cntr);
       }
     else if(this.cntr == 1)
       {
         this.clearText();
         this.cntr = 0;
       }
+    text(this.Text, this.x, this.y);
+    
       
   }
   clearText()
@@ -53,7 +54,6 @@ class TextBox
   }
   setTextTemp(txt, counter)
   {
-    print("SETTING TEXT TEMP");
     this.Text = txt;
     this.cntr = counter;
   }
