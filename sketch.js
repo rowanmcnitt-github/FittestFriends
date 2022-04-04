@@ -988,8 +988,8 @@ class leaderboardTab
     push();
     //radius, height, dX, detailY
     translate(this.x, this.y + podiumHeight * 3.5);
-    scale(0.9);
-    rotateY(sin(millis() / 4000) / 10);
+    scale(0.8);
+    rotateY(sin(millis() / 4000) / 9 - PI/8);
     rotateX(sin(millis() /3000) /8.4 - PI/8);
     
     let tp_friend;
@@ -1011,7 +1011,10 @@ class leaderboardTab
     push();
     noStroke();
     translate(-podiumWidth,-podiumHeight / 2);
-    if(this.sortedIndex.length>=3){fill(0);textSize(60);text(this.entries[this.sortedIndex[2]].name, 0, -podiumHeight * 3.5);}
+        push();
+    translate(0,0,podiumWidth/2);
+    if(this.sortedIndex.length>=3){fill(0);textSize(60);text(this.entries[this.sortedIndex[2]].name, 0, -podiumHeight * 4.5);}
+    pop();
     fill(70);
     cylinder(podiumWidth/2, podiumHeight, 8,8);
     pop();
@@ -1043,8 +1046,10 @@ class leaderboardTab
     push();
     noStroke();
     translate(0,-podiumHeight / 2 * 3, midPodiumZ);
-    
-    if(this.sortedIndex.length>=1){fill(0);textSize(40);text(this.entries[this.sortedIndex[0]].name, 0, -podiumHeight * 5.5);}
+        push();
+    translate(0,0,podiumWidth/2);
+    if(this.sortedIndex.length>=1){fill(0);textSize(40);text(this.entries[this.sortedIndex[0]].name, 0, -podiumHeight * 6.5);}
+    pop();
       fill(97, 84, 49);
     cylinder(podiumWidth/2, podiumHeight*3, 8,8);
     pop();
@@ -1062,7 +1067,10 @@ class leaderboardTab
     push();
     noStroke();
     translate(podiumWidth, -podiumHeight / 2 * 2);
-    if(this.sortedIndex.length>=1){fill(0);textSize(40);text(this.entries[this.sortedIndex[1]].name, 0, -podiumHeight * 4.5);}
+    push();
+    translate(0,0,podiumWidth/2);
+    if(this.sortedIndex.length>=1){fill(0);textSize(40);text(this.entries[this.sortedIndex[1]].name, 0, -podiumHeight * 5.5);}
+    pop();
     fill(200);
     cylinder(podiumWidth/2, podiumHeight*2, 8,8);
     pop();
