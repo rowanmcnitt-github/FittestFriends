@@ -231,7 +231,7 @@ function setup()
   //header is 5% of screenheight
   headerHeight = 0.08 * height;
   //
-  headerColor = color(100);
+  headerColor = color(200);
   mainTextColor = color(0);
   //
   //TAB SETUP
@@ -480,6 +480,7 @@ function finishLogin(status, userDat)
       fillData(userDat);
       usernameBox.clearText();
       passwordBox.clearText();
+      LBtab.populate(friendList);
       logStatus = 2;
     }
   else
@@ -643,8 +644,8 @@ function draw()
       // login / register
       let buttonHeight = height / 12;
       fill(0);
-      textSize(50);
-      text("Welcome to Fitness Friends!", width / 2, headerHeight + buttonHeight / 2);
+      textSize(50 + 2.5*sin(millis()/1000));
+      text("Welcome to Fittest Friends!", width / 2, headerHeight + buttonHeight / 2);
       textSize(30);
       text("Login or Register", width/2, headerHeight + buttonHeight);
       draw_header();
@@ -675,9 +676,9 @@ function draw_header()
   rect(width/2,headerHeight / 2,width,headerHeight);
   //
   fill(mainTextColor);
-  textSize(headerTextSize);
+  textSize(headerTextSize + 2*sin(millis() / 4000));
   textAlign(CENTER,CENTER);
-  text("Fitness Friends", width/2, headerHeight / 2)
+  text("Fittest Friends", width/2, headerHeight / 2)
   if(logStatus == 2)
     {
       textSize(headerTextSize * .8);
@@ -936,7 +937,10 @@ class friendsTab
   }
   populate(friendData)
   {
-    LBtab.populate(friendData);
+    if(currentUser != null)
+      {
+        LBtab.populate(friendData);
+      }
     let buttonWidth = this.fWidth / 4;
     this.entries = friendData; // maybe change later
     this.friendCount = friendData.length;
@@ -1117,6 +1121,7 @@ class leaderboardTab
     arrayCopy(friendData2,friendData);
     // /constructor(name, liftData, faceImage, shirtColor, skinColor)
     //userName, shirtColor, skinColor, faceType, workoutData, friendList)
+    print(currentUser);
     append(friendData, (new Friend(currentUser.userName, userLiftData, currentUser.faceType, currentUser.shirtColor, currentUser.skinColor)));
     let buttonWidth = this.fWidth / 4;
     this.entries = friendData; // maybe change later
